@@ -1,0 +1,13 @@
+connect_check:
+    path: /connect/check
+    defaults: { _controller: 'App\Controller\ConnectController::connectCheck' }
+
+# Depends on sensio/framework-extra-bundle, doctrine/annotations, and doctrine/cache
+#   install with composer req sensio/framework-extra-bundle annot
+#controllers:
+#    resource: ../src/Controller/
+#    type: annotation
+
+#fos_user_security:
+#    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+
