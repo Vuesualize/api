@@ -38,7 +38,7 @@ COPY docker/php/php.ini /usr/local/etc/php/php.ini
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
-WORKDIR /srv/api
+WORKDIR /srv
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 
