@@ -3,12 +3,11 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
-
 
 /**
  * @ApiResource()
@@ -18,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 class Transition
 {
     /**
-     * @var int The entity Id
+     * @var int
      *
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -43,8 +42,8 @@ class Transition
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Step")
      *
-     * @Groups("admin")
-     * @MaxDepth(1)
+     * @Groups({"write"})
+     *
      */
     private $fromStep;
 
@@ -52,9 +51,9 @@ class Transition
      * @var Step
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\Step")
-     * @ORM\JoinColumn(nullable=true)
      *
-     * @Groups("admin")
+     * @Groups({"write"})
+     *
      */
     private $toStep;
 
@@ -95,35 +94,26 @@ class Transition
         $this->fromStep = $fromStep;
     }
 
-    /**
-     * @return Step
-     */
     public function getToStep(): Step
     {
         return $this->toStep;
     }
 
-    /**
-     * @param Step $toStep
-     */
     public function setToStep(Step $toStep): void
     {
         $this->toStep = $toStep;
     }
 
     /**
+     * @return string[]
+     *
      * @Groups({"read"})
      */
-    public function getFromStepId(): int
+    public function getBetweenSteps(): array
     {
-        return $this->fromStep->getId();
-    }
-
-    /**
-     * @Groups({"read"})
-     */
-    public function getToStepId(): int
-    {
-        return $this->toStep->getId();
+        return [
+            '/steps/'.$this->fromStep->getId(),
+            '/steps/'.$this->toStep->getId(),
+        ];
     }
 }

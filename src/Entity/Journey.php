@@ -4,15 +4,12 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
-
-
 
 /**
  * @ApiResource(
@@ -25,7 +22,6 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *              "access_control"="is_granted('ROLE_USER') and object.getOwnerId() == user.getId()"
  *          }
  *     }
- *
  * )
  *
  * @ORM\Entity
@@ -89,19 +85,16 @@ class Journey
      * @ORM\ManyToOne(targetEntity="App\Entity\ApplicationUser")
      * @ORM\JoinColumn(nullable=true)
      *
-     * @Groups("admin")
-     * @MaxDepth(1)
-     *
-     * @ApiProperty(readable=false, readableLink=false)
+     * @Groups("auto-generated")
      */
     private $owner;
 
     /**
      * @var Project
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project", fetch="LAZY")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Project")
      *
-     * @Groups({"read"})
+     * @Groups({"read", "write"})
      */
     private $project;
 
@@ -112,66 +105,51 @@ class Journey
      * @ORM\OrderBy({"id"="ASC"})
      *
      * @Groups({"read"})
-     *
-     * @MaxDepth(2)
      */
     private $steps;
+
+    public function __construct()
+    {
+        $this->steps = new ArrayCollection();
+    }
 
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
     public function setDescription(string $description)
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
     public function getImageUrl(): string
     {
         return $this->imageUrl;
     }
 
-    /**
-     * @param string $imageUrl
-     */
     public function setImageUrl(string $imageUrl)
     {
         $this->imageUrl = $imageUrl;
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getTags(): array
     {
@@ -179,7 +157,7 @@ class Journey
     }
 
     /**
-     * @param array $tags
+     * @param string[] $tags
      */
     public function setTags(array $tags)
     {
@@ -196,22 +174,11 @@ class Journey
         $this->owner = $owner;
     }
 
-    public function getOwnerId()
-    {
-        return $this->getOwner()->getId();
-    }
-
-    /**
-     * @return Project
-     */
     public function getProject(): Project
     {
         return $this->project;
     }
 
-    /**
-     * @param Project $project
-     */
     public function setProject(Project $project): void
     {
         $this->project = $project;
@@ -231,5 +198,32 @@ class Journey
     public function setSteps(Collection $steps): void
     {
         $this->steps = $steps;
+    }
+
+    public function getOwnerId(): int
+    {
+        return $this->owner->getId();
+    }
+
+    /**
+     * @return array
+     *
+     * @Groups({"read"})
+     */
+    public function getTransitions()
+    {
+        $transitions = [];
+
+        foreach ($this->steps as $step) {
+            foreach ($step->getIncomingTransitions() as $transition) {
+                $transitions[$transition->getId()] = $transition;
+            }
+
+            foreach ($step->getOutgoingTransitions() as $transition) {
+                $transitions[$transition->getId()] = $transition;
+            }
+        }
+
+        return array_values($transitions);
     }
 }

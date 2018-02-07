@@ -10,7 +10,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     attributes={
+ *          "normalization_context"={"groups"={"project-read"}},
+ *          "denormalization_context"={"groups"={"project-write"}}
+ *     }
+ * )
  *
  * @ORM\Entity
  */
@@ -23,7 +28,7 @@ class Project
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @Groups({"read", "write"})
+     * @Groups({"project-read", "project-write"})
      */
     private $id;
 
@@ -33,7 +38,7 @@ class Project
      * @ORM\Column
      * @Assert\NotBlank
      *
-     * @Groups({"read", "write"})
+     * @Groups({"project-read", "project-write"})
      */
     public $name = '';
 
@@ -43,7 +48,7 @@ class Project
      * @ORM\Column
      * @Assert\NotBlank
      *
-     * @Groups({"read", "write"})
+     * @Groups({"project-read", "project-write"})
      */
     public $description = '';
 
@@ -53,7 +58,7 @@ class Project
      * @ORM\Column
      * @Assert\NotBlank
      *
-     * @Groups({"read", "write"})
+     * @Groups({"project-read", "project-write"})
      */
     public $imageUrl = '';
 

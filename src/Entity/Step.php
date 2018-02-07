@@ -4,12 +4,11 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
-
 
 /**
  * @ApiResource()
@@ -19,13 +18,13 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 class Step
 {
     /**
-     * @var int The entity Id
+     * @var int
      *
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
-     * @Groups({"read", "write"})
+     * @Groups({"step-read", "read", "write"})
      */
     private $id;
 
@@ -66,7 +65,6 @@ class Step
      * @ORM\JoinColumn(nullable=true)
      *
      * @Groups({"write"})
-     * @MaxDepth(1)
      */
     private $journey;
 
@@ -75,12 +73,8 @@ class Step
      *
      * @ORM\OneToMany(targetEntity="App\Entity\Transition", mappedBy="fromStep")
      * @ORM\OrderBy({"id"="ASC"})
-     *
-     * @Groups({"read"})
-     *
-     * @MaxDepth(1)
      */
-    private $outTransitions;
+    private $outgoingTransitions;
 
 
     /**
@@ -88,12 +82,14 @@ class Step
      *
      * @ORM\OneToMany(targetEntity="App\Entity\Transition", mappedBy="toStep")
      * @ORM\OrderBy({"id"="ASC"})
-     *
-     * @Groups({"read"})
-     *
-     * @MaxDepth(1)
      */
-    private $inTransitions;
+    private $incomingTransitions;
+
+    public function __construct()
+    {
+        $this->incomingTransitions = new ArrayCollection();
+        $this->outgoingTransitions = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -167,32 +163,49 @@ class Step
     /**
      * @return Transition[]|Collection
      */
-    public function getOutTransitions(): Collection
+    public function getOutgoingTransitions(): Collection
     {
-        return $this->outTransitions;
-    }
-
-    /**
-     * @param Transition[]|Collection $outTransitions
-     */
-    public function setOutTransitions(Collection $outTransitions): void
-    {
-        $this->outTransitions = $outTransitions;
+        return $this->outgoingTransitions;
     }
 
     /**
      * @return Transition[]|Collection
      */
-    public function getInTransitions(): Collection
+    public function getIncomingTransitions(): Collection
     {
-        return $this->inTransitions;
+        return $this->incomingTransitions;
+    }
+
+
+    /**
+     * @return string[]
+     *
+     * @Groups({"read"})
+     */
+    public function getInTransitions(): array
+    {
+        $ids = [];
+
+        foreach ($this->incomingTransitions as $transition) {
+            $ids[] = '/transitions/'.$transition->getId();
+        }
+
+        return $ids;
     }
 
     /**
-     * @param Transition[]|Collection $inTransitions
+     * @return string[]
+     *
+     * @Groups({"read"})
      */
-    public function setInTransitions(Collection $inTransitions): void
+    public function getOutTransitions(): array
     {
-        $this->inTransitions = $inTransitions;
+        $ids = [];
+
+        foreach ($this->outgoingTransitions as $transition) {
+            $ids[] = '/transitions/'.$transition->getId();
+        }
+
+        return $ids;
     }
 }
