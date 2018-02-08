@@ -28,3 +28,8 @@ services:
         resource: '../src/Controller'
         public: true
         tags: ['controller.service_arguments']
+
+
+    App\Doctrine\ORM\Extension\CurrentUserExtension:
+        tags:
+            - { name: api_platform.doctrine.orm.query_extension.collection, priority: 9 }
