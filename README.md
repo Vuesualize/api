@@ -1,2 +1,9 @@
-# api
-Vuesualize Backend: REST API, GraphQL
+# Vuesualize API
+
+API for Vuesualize User Journey 
+
+Provides:
+* REST API, 
+* TODO: GraphQL
+
+
